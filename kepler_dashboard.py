@@ -989,7 +989,7 @@ with tab4:
                 yref='paper',
                 text='Higher values indicate better performance on that class',
                 showarrow=False,
-                font=dict(size=12)
+                font=dict(size=13)
             )
         ]
     )
