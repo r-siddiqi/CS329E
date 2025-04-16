@@ -454,11 +454,22 @@ with tab1:
                 'PC3': 'PC3 (8.98%)'
             },
             opacity=0.7,
-            height=700
+            height=700,
+            hover_data={
+                'PC1': ':.3f',
+                'PC2': ':.3f',
+                'PC3': ':.3f',
+                'Class': True
+            }
         )
 
-        fig_3d.update_traces(marker=dict(size=3,
-                                      sizemode='diameter'))
+        fig_3d.update_traces(
+            marker=dict(size=3, sizemode='diameter'),
+            hovertemplate='<b>%{customdata[0]}</b><br>' +
+                         'PC1: %{x:.3f}<br>' +
+                         'PC2: %{y:.3f}<br>' +
+                         'PC3: %{z:.3f}<extra></extra>'
+        )
 
         # Update layout
         fig_3d.update_layout(
@@ -491,19 +502,60 @@ with tab1:
         explained_variance = [0.2319, 0.1223, 0.0898]
         total_variance = sum(explained_variance)
 
-        fig_var = px.bar(
+        # Define top 5 features for each PC
+        pc_features = {
+            'PC1': [
+                'koi_imag',
+                'koi_kepmag',
+                'koi_zmag',
+                'koi_rmag',
+                'koi_jmag'
+            ],
+            'PC2': [
+                'koi_sma',
+                'koi_period',
+                'koi_time0bk',
+                'koi_time0',
+                'koi_dor'
+            ],
+            'PC3': [
+                'koi_max_mult_ev',
+                'koi_max_sngle_ev',
+                'koi_depth',
+                'koi_model_snr',
+                'koi_fpflag_ss'
+            ]
+        }
+
+        # Create the bar chart
+        fig_var = go.Figure()
+
+        # Add bars
+        fig_var.add_trace(go.Bar(
             x=['PC1', 'PC2', 'PC3'],
             y=explained_variance,
-            title=f'Explained Variance Ratio',
-            labels={'x': 'Principal Component', 'y': 'Explained Variance Ratio'},
-            color_discrete_sequence=[COLORBLIND_PALETTE['purple']]
-        )
+            marker_color=COLORBLIND_PALETTE['purple'],
+            text=[f'{v:.1%}' for v in explained_variance],
+            textposition='outside',
+            hovertemplate='<b>%{x}</b><br>' +
+                         'Explained Variance: %{y:.1%}<br>' +
+                         '<br><b>Top 5 Features:</b><br>' +
+                         '%{customdata[0]}<br>' +
+                         '%{customdata[1]}<br>' +
+                         '%{customdata[2]}<br>' +
+                         '%{customdata[3]}<br>' +
+                         '%{customdata[4]}<br>' +
+                         '<extra></extra>',
+            customdata=[[features for features in pc_features[pc]] for pc in ['PC1', 'PC2', 'PC3']]
+        ))
 
         fig_var.update_layout(
             xaxis_title="Principal Component",
             yaxis_title="Explained Variance Ratio",
             yaxis_tickformat='.1%',
-            showlegend=False
+            showlegend=False,
+            height=400,
+            margin=dict(t=30, b=30, l=30, r=30)
         )
 
         st.plotly_chart(fig_var, use_container_width=True)
@@ -512,7 +564,7 @@ with tab1:
         st.markdown("""
         The first 3 principal components capture approximately 44.4% of the variance in the dataset:
 
-        - **PC1** captures features related to transit depth and stellar parameters
+        - **PC1** captures features related to different magnitude components of the light curve
         - **PC2** relates to orbital characteristics
         - **PC3** correlates with signal quality measurements
 
