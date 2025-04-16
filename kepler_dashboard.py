@@ -653,7 +653,7 @@ with tab2:
 
         # Improve hover information
         fig.update_traces(
-            hovertemplate='<b>%{customdata[0]} (%{customdata[1]})</b><br>%{x}<br>%{y:.4f}<extra>%{fullData.name}</extra>',
+            hovertemplate='<b>%{x}</b><br>%{y:.4f}<extra>%{fullData.name}</extra>',
             textposition='outside'  # Place text values outside the bars
         )
 
